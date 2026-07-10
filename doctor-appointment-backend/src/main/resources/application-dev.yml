@@ -1,0 +1,93 @@
+# ================================================================
+# DEVELOPMENT PROFILE CONFIGURATION (application-dev.yml)
+# ================================================================
+# Activated when: spring.profiles.active=dev
+# Purpose: Local development. Uses local MySQL, verbose logging,
+#          Hibernate auto-creates/updates schema for rapid dev.
+# ================================================================
+
+spring:
+
+  # --------------------------------------------------------------
+  # DATABASE: Local MySQL for development
+  # Run MySQL locally or via docker-compose
+  # --------------------------------------------------------------
+  datasource:
+    url: jdbc:mysql://localhost:3306/doctor_appointment_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # HikariCP Connection Pool Settings
+    hikari:
+      pool-name: DoctorAppHikariPool-Dev
+      minimum-idle: 2
+      maximum-pool-size: 10
+      idle-timeout: 30000        # 30 seconds
+      connection-timeout: 20000  # 20 seconds
+      max-lifetime: 1800000      # 30 minutes
+
+  # --------------------------------------------------------------
+  # JPA / HIBERNATE
+  # Changed from 'update' to 'validate' because Flyway now handles DB schema.
+  # --------------------------------------------------------------
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true               # Print SQL to console in dev
+
+  # --------------------------------------------------------------
+  # FLYWAY
+  # Automatically runs V*.sql scripts on startup.
+  # baseline-on-migrate helps integrate into existing databases.
+  # --------------------------------------------------------------
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  # --------------------------------------------------------------
+  # MAIL: Mailtrap (fake SMTP for dev email testing)
+  # Sign up free at: https://mailtrap.io
+  # --------------------------------------------------------------
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: ${MAIL_USERNAME:your_mailtrap_username}
+    password: ${MAIL_PASSWORD:your_mailtrap_password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# ================================================================
+# LOGGING: Verbose for development
+# ================================================================
+logging:
+  level:
+    root: INFO
+    com.healthcare.appointment: DEBUG       # Application-level DEBUG
+    org.springframework.security: DEBUG    # Security filter chain details
+    org.springframework.web: DEBUG         # Request mapping details
+    org.hibernate.SQL: DEBUG               # Actual SQL queries
+    org.hibernate.type.descriptor.sql: TRACE  # SQL parameter values
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%xwEx"
+  file:
+    name: logs/doctor-appointment-dev.log
+
+# ================================================================
+# DEV-SPECIFIC ACTUATOR (show all details in dev)
+# ================================================================
+management:
+  endpoint:
+    health:
+      show-details: always
+
+# ================================================================
+# JWT CUSTOM PROPERTIES
+# ================================================================
+application:
+  jwt:
+    secret-key: 
+

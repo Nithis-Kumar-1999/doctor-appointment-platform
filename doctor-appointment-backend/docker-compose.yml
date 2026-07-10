@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # DATABASE SERVICE (MySQL 8)
+  # ==========================================
+  db:
+    image: mysql:8.0
+    container_name: doctor_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${DB_NAME:-doctor_appointment_db}
+      MYSQL_USER: ${DB_USERNAME:-healthcare_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-healthcare_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - doctor_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # BACKEND API SERVICE (Spring Boot)
+  # ==========================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: doctor_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # Link to the db service using its container name
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-doctor_appointment_db}
+      - DB_USERNAME=${DB_USERNAME:-healthcare_user}
+      - DB_PASSWORD=${DB_PASSWORD:-healthcare_password}
+      # JWT Secret must be injected via .env in production
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-DefaultInsecureSecretKeyMustBeChangedInProd404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+    networks:
+      - doctor_network
+
+# ==========================================
+# NAMED VOLUMES (Persistent Storage)
+# ==========================================
+volumes:
+  db_data:
+
+# ==========================================
+# NETWORK ISOLATION
+# ==========================================
+networks:
+  doctor_network:
+    driver: bridge

@@ -1,0 +1,121 @@
+# ================================================================
+# APPLICATION CONFIGURATION - BASE (application.yml)
+# ================================================================
+# This is the BASE configuration file loaded in ALL environments.
+# Environment-specific overrides are in application-dev.yml
+# and application-prod.yml.
+# Spring Boot merges base + profile-specific properties.
+# ================================================================
+
+spring:
+  application:
+    name: doctor-appointment-system
+
+  # --------------------------------------------------------------
+  # PROFILE ACTIVATION
+  # Override via: --spring.profiles.active=prod (at runtime)
+  # Or: SPRING_PROFILES_ACTIVE=prod (as environment variable)
+  # --------------------------------------------------------------
+  profiles:
+    active: dev
+
+  # --------------------------------------------------------------
+  # JPA / HIBERNATE COMMON SETTINGS
+  # DDL-auto is intentionally set to 'none' here.
+  # Each profile sets its own DDL strategy.
+  # --------------------------------------------------------------
+  jpa:
+    open-in-view: false          # Disables OSIV: prevents lazy-loading leaks
+    properties:
+      hibernate:
+        format_sql: true         # Pretty-prints SQL in logs
+        use_sql_comments: true   # Adds HQL comments to SQL output
+        jdbc:
+          time_zone: UTC         # Standardize timezone for all DB operations
+
+  # --------------------------------------------------------------
+  # JACKSON JSON SERIALIZATION
+  # --------------------------------------------------------------
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false   # ISO-8601 dates, not unix timestamps
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false  # Ignore unknown JSON fields gracefully
+    time-zone: UTC
+    default-property-inclusion: non_null # Never serialize null fields in responses
+
+  # --------------------------------------------------------------
+  # MAIL (placeholders; overridden in environment-specific files)
+  # --------------------------------------------------------------
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# ================================================================
+# SERVER
+# ================================================================
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  error:
+    include-message: never        # SECURITY: never expose raw exception messages
+    include-stacktrace: never     # SECURITY: never expose stack traces to client
+    include-binding-errors: never # Handled by our GlobalExceptionHandler
+
+# ================================================================
+# ACTUATOR (Health checks for Docker/K8s probes)
+# ================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Doctor Appointment Management System
+    version: 1.0.0
+    description: Enterprise-grade healthcare appointment platform
+
+# ================================================================
+# SPRINGDOC / SWAGGER UI
+# ================================================================
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+  show-actuator: false
+
+# ================================================================
+# APPLICATION CUSTOM PROPERTIES
+# (Accessed via @ConfigurationProperties beans)
+# ================================================================
+application:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+    expiration-ms: 86400000         # 24 hours in milliseconds
+    refresh-token-expiration-ms: 604800000  # 7 days in milliseconds
+
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
+  pagination:
+    default-page-size: 10
+    max-page-size: 50

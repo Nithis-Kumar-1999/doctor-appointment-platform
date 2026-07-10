@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ============================================================ -->
+    <!-- PARENT: Spring Boot BOM manages all dependency versions      -->
+    <!-- ============================================================ -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.0</version>
+        <relativePath/>
+    </parent>
+
+    <!-- ============================================================ -->
+    <!-- PROJECT COORDINATES                                          -->
+    <!-- ============================================================ -->
+    <groupId>com.healthcare</groupId>
+    <artifactId>doctor-appointment</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Doctor Appointment Management System</name>
+    <description>
+        Enterprise-grade Doctor Appointment Management System built with
+        Spring Boot 3.x, Spring Security, JWT, JPA, and MySQL.
+    </description>
+
+    <!-- ============================================================ -->
+    <!-- PROPERTIES                                                   -->
+    <!-- ============================================================ -->
+    <properties>
+        <!-- Java Version -->
+        <java.version>17</java.version>
+
+        <!-- Dependency Versions (declared explicitly for auditability) -->
+        <jjwt.version>0.12.5</jjwt.version>
+        <springdoc.version>2.5.0</springdoc.version>
+        <modelmapper.version>3.2.0</modelmapper.version>
+        <itext.version>8.0.4</itext.version>
+        <poi.version>5.2.5</poi.version>
+        <testcontainers.version>1.19.8</testcontainers.version>
+
+        <!-- Maven Plugin Versions -->
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <!-- ============================================================ -->
+    <!-- DEPENDENCIES                                                 -->
+    <!-- ============================================================ -->
+    <dependencies>
+
+        <!-- ========================================================= -->
+        <!-- CORE SPRING BOOT STARTERS                                 -->
+        <!-- ========================================================= -->
+
+        <!-- Web: REST Controllers, Embedded Tomcat, Jackson JSON -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Spring Security: Authentication + Authorization -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- Spring Data JPA: ORM, Repository abstraction, Hibernate -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Bean Validation: @NotNull, @Email, @Size on DTOs -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Actuator: /actuator/health, /actuator/info endpoints -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Mail: Email notifications using JavaMailSender -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- ========================================================= -->
+        <!-- DATABASE                                                  -->
+        <!-- ========================================================= -->
+
+        <!-- MySQL JDBC Driver (runtime: only needed at runtime)      -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ========================================================= -->
+        <!-- SECURITY: JWT (JSON Web Tokens)                          -->
+        <!-- Using JJWT library - the industry standard for Java JWT  -->
+        <!-- ========================================================= -->
+
+        <!-- JJWT API: Interfaces and Builders -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+
+        <!-- JJWT Implementation: Core JWT processing logic -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- JJWT Jackson: JSON serialization/deserialization for JWT -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ========================================================= -->
+        <!-- API DOCUMENTATION: Swagger / OpenAPI 3                   -->
+        <!-- ========================================================= -->
+
+        <!-- Springdoc: Auto-generates Swagger UI from Spring MVC     -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- ========================================================= -->
+        <!-- UTILITIES                                                 -->
+        <!-- ========================================================= -->
+
+        <!-- Lombok: Reduces boilerplate (@Data, @Builder, @Slf4j)    -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ModelMapper: Entity <-> DTO mapping (clean & type-safe)  -->
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>${modelmapper.version}</version>
+        </dependency>
+
+        <!-- ========================================================= -->
+        <!-- EXPORT FEATURES                                           -->
+        <!-- ========================================================= -->
+
+        <!-- iText: Generate PDF documents for reports               -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext-core</artifactId>
+            <version>${itext.version}</version>
+            <type>pom</type>
+        </dependency>
+
+        <!-- Apache POI: Generate Excel files (.xlsx) for reports    -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
+        <!-- ========================================================= -->
+        <!-- DATABASE MIGRATION: Flyway                                -->
+        <!-- ========================================================= -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
+
+        <!-- ========================================================= -->
+        <!-- TESTING                                                   -->
+        <!-- ========================================================= -->
+
+        <!-- Spring Boot Test: JUnit 5, Mockito, MockMvc, TestContext -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Spring Security Test: @WithMockUser, SecurityMockMvc    -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ============================================================ -->
+    <!-- BUILD PLUGINS                                                -->
+    <!-- ============================================================ -->
+    <build>
+        <plugins>
+
+            <!-- Spring Boot Maven Plugin: Creates executable fat JAR -->
+            <!-- Excludes Lombok from the final artifact              -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Compiler Plugin: Enforces Java 17 compilation -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <!-- Enable annotation processing for Lombok      -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Surefire Plugin: Runs JUnit 5 tests           -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Prevent module access issues with Java 17   -->
+                    <argLine>
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                    </argLine>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Failsafe Plugin: Runs integration tests (*IT) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

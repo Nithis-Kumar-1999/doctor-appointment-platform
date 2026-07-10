@@ -1,0 +1,31 @@
+.git
+.gitignore
+.idea/
+.vscode/
+
+# Build directories
+target/
+build/
+out/
+bin/
+
+# IDE files
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Maven wrapper (using official maven image for build instead)
+.mvn/
+mvnw
+mvnw.cmd

@@ -1,0 +1,111 @@
+# ================================================================
+# PRODUCTION PROFILE CONFIGURATION (application-prod.yml)
+# ================================================================
+# Activated when: SPRING_PROFILES_ACTIVE=prod (env variable)
+# Purpose: Production-safe configuration.
+# CRITICAL RULES:
+#   - All secrets MUST come from environment variables.
+#   - No hardcoded credentials.
+#   - ddl-auto = validate ONLY (never create or update).
+#   - Logging is minimal (INFO only, no SQL).
+# ================================================================
+
+spring:
+
+  # --------------------------------------------------------------
+  # DATABASE: Production MySQL (credentials from env variables)
+  # NEVER hardcode DB credentials in source code.
+  # These come from Docker secrets or cloud environment variables.
+  # --------------------------------------------------------------
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: DoctorAppHikariPool-Prod
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 600000       # 10 minutes
+      connection-timeout: 30000  # 30 seconds
+      max-lifetime: 1800000      # 30 minutes
+      leak-detection-threshold: 60000  # Warn if connection held > 60s
+
+  # --------------------------------------------------------------
+  # JPA / HIBERNATE
+  # 'validate': Hibernate validates schema matches entities.
+  # If there is a mismatch, application FAILS TO START.
+  # This is the ONLY safe option in production.
+  # --------------------------------------------------------------
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false              # NEVER log SQL in production (data privacy)
+
+  # --------------------------------------------------------------
+  # FLYWAY MIGRATION
+  # --------------------------------------------------------------
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    
+  # --------------------------------------------------------------
+  # MAIL: Real SMTP (e.g., SendGrid or AWS SES)
+  # --------------------------------------------------------------
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+
+# ================================================================
+# LOGGING: Minimal for production (INFO only, to file)
+# ================================================================
+logging:
+  level:
+    root: INFO
+    com.healthcare.appointment: INFO
+    org.springframework.security: WARN
+    org.hibernate: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /var/log/doctor-appointment/app.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB
+
+# ================================================================
+# SERVER: Additional production hardening
+# ================================================================
+server:
+  port: ${SERVER_PORT:8080}
+  # Enable HTTP/2 for better performance
+  http2:
+    enabled: true
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html
+    min-response-size: 1024
+
+# ================================================================
+# ACTUATOR: Restrict in production (health check only)
+# ================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# ================================================================
+# JWT CUSTOM PROPERTIES
+# ================================================================
+application:
+  jwt:
+    secret-key:  # MUST be provided via env variable in prod
+

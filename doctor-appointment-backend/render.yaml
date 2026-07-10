@@ -1,0 +1,63 @@
+# ====================================================================
+# Render Blueprint (Infrastructure as Code)
+# Automatically provisions the Database and Web Service on Render.com
+# ====================================================================
+
+services:
+  # ---------------------------------------------------------
+  # 1. DATABASE: MySQL Private Service
+  # Runs on a private network, inaccessible from the public internet.
+  # ---------------------------------------------------------
+  - type: pserv
+    name: doctor-db
+    env: docker
+    dockerfilePath: db.Dockerfile
+    # Persistent disk ensures data survives container restarts
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 10
+    envVars:
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+      - key: MYSQL_DATABASE
+        value: doctor_appointment_db
+      - key: MYSQL_USER
+        value: healthcare_user
+      - key: MYSQL_PASSWORD
+        generateValue: true
+
+  # ---------------------------------------------------------
+  # 2. BACKEND: Spring Boot Web Service
+  # Publicly accessible API.
+  # ---------------------------------------------------------
+  - type: web
+    name: doctor-backend
+    env: docker
+    dockerfilePath: Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+        
+      # Database Connection Strings (Auto-linked to the DB service)
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: doctor-db
+          property: host
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_NAME
+        value: doctor_appointment_db
+      - key: DB_USERNAME
+        value: healthcare_user
+      - key: DB_PASSWORD
+        fromService:
+          type: pserv
+          name: doctor-db
+          envVarKey: MYSQL_PASSWORD
+          
+      # Security Secret (Render securely generates a 256-bit key on first deploy)
+      - key: JWT_SECRET_KEY
+        generateValue: true
