@@ -1,41 +1,32 @@
-# ====================================================================
-# Render Blueprint (Infrastructure as Code)
-# ZERO-COST OPTIMIZED
-# ====================================================================
-
 services:
-  # ---------------------------------------------------------
-  # BACKEND: Spring Boot Web Service
-  # Runs on Render's Free Tier.
-  # ---------------------------------------------------------
   - type: web
     name: doctor-backend
     env: docker
     plan: free
     dockerfilePath: Dockerfile
     healthCheckPath: /actuator/health
-    
-    # Environment Variables required by the Spring Boot Production Profile
+
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-        
-      # Database connection variables must now be supplied manually in the Render Dashboard
+
       - key: DB_HOST
         sync: false
+
       - key: DB_PORT
-        value: "25060" # Typical Aiven port (modify in dashboard if using another provider)
+        value: "26769"
+
       - key: DB_NAME
         value: defaultdb
+
       - key: DB_USERNAME
         sync: false
+
       - key: DB_PASSWORD
         sync: false
-        
-      # CORS configuration required for frontend communication
+
       - key: APP_CORS_ALLOWED_ORIGINS
         sync: false
-          
-      # Security Secret (Render securely generates a 256-bit key on first deploy)
+
       - key: JWT_SECRET_KEY
         generateValue: true
