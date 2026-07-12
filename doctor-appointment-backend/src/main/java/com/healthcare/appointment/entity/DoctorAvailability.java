@@ -43,7 +43,7 @@ import java.time.LocalTime;
 @ToString(exclude = "doctor")
 @Entity
 @Table(
-        name = "doctor_availability",
+        name = "doctor_availabilities",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_availability_doctor_day",
