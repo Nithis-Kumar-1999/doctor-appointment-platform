@@ -249,7 +249,7 @@ public class Doctor extends BaseEntity {
             regexp = "^[+]?[(]?[0-9]{1,4}[)]?[-\\s./0-9]{8,14}$",
             message = "Phone number must be a valid format (e.g., +91-9876543210)"
     )
-    @Column(name = "phone", nullable = false, length = 20)
+    @Column(name = "phone_number", nullable = false, length = 20)
     private String phone;
 
     /**
