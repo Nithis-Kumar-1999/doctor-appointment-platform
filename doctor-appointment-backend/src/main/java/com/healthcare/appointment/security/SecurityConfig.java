@@ -74,10 +74,15 @@ public class SecurityConfig {
                 
                 // 4. Define Endpoint Authorization Rules
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints (Authentication & Documentation)
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        // All other endpoints require authentication
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                // Render Health Check
+                                "/actuator/**"
+                        ).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 
