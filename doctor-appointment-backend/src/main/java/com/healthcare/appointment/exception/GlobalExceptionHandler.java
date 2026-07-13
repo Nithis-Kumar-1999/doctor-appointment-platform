@@ -84,10 +84,17 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
-            Exception ex, HttpServletRequest request) {
-        
-        // Log the full stack trace here in a real application
-        return buildErrorResponse("An unexpected internal error occurred.", HttpStatus.INTERNAL_SERVER_ERROR, request, null);
+            Exception ex,
+            HttpServletRequest request) {
+
+        // Print the actual exception in Render logs
+        ex.printStackTrace();
+
+        return buildErrorResponse(
+                ex.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                request,
+                null);
     }
 
     /**
