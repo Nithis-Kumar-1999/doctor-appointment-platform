@@ -80,6 +80,7 @@ public class DoctorAvailability extends BaseEntity {
      * is meaningless. This also allows Hibernate to use a proxy,
      * making LAZY effective on this owning side.
      */
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @NotNull(message = "Doctor is required for availability entry")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
