@@ -79,6 +79,16 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles 404 No Resource Found exceptions thrown by DispatcherServlet in Spring Boot 3.
+     */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFoundException(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex, HttpServletRequest request) {
+        
+        return buildErrorResponse("Static resource not found: " + ex.getResourcePath(), HttpStatus.NOT_FOUND, request, null);
+    }
+
+    /**
      * Fallback handler for any uncaught RuntimeExceptions.
      * Maps to 500 Internal Server Error.
      */
