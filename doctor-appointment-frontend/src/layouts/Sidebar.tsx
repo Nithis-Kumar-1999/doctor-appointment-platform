@@ -16,12 +16,11 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerWidth, mobileOpen, handleDrawer
   const location = useLocation();
   const navigate = useNavigate();
 
-  // In a real app, these items would be filtered based on useAuth().user.role
   const navItems = [
-    { label: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
-    { label: 'Appointments', path: '/dashboard/appointments', icon: <EventIcon /> },
-    { label: 'Availability', path: '/dashboard/availability', icon: <AccessTimeIcon /> },
-    { label: 'Profile', path: '/dashboard/profile', icon: <PersonIcon /> },
+    { label: 'Dashboard', path: '/doctor/dashboard', icon: <DashboardIcon /> },
+    { label: 'Profile', path: '/doctor/profile', icon: <PersonIcon /> },
+    { label: 'Availability', path: '/doctor/availability', icon: <AccessTimeIcon /> },
+    { label: 'Appointments', path: '/doctor/appointments', icon: <EventIcon /> },
   ];
 
   const drawerContent = (
@@ -48,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerWidth, mobileOpen, handleDrawer
                 <ListItemIcon sx={{ color: isActive ? 'primary.contrastText' : 'inherit', minWidth: 40 }}>
                   {item.icon}
                 </ListItemIcon>
-                <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: isActive ? 'bold' : 'medium' }} />
+                <ListItemText primary={item.label} sx={{ '& .MuiListItemText-primary': { fontWeight: isActive ? 'bold' : 'medium' } }} />
               </ListItemButton>
             </ListItem>
           );
@@ -89,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ drawerWidth, mobileOpen, handleDrawer
 
 const ToolbarLogo = () => (
   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 64, px: 2 }}>
-    <Typography variant="h5" color="primary.main" fontWeight="900" sx={{ letterSpacing: 1 }}>
+    <Typography variant="h5" color="primary.main" sx={{ fontWeight: '900', letterSpacing: 1 }}>
       CarePortal
     </Typography>
   </Box>

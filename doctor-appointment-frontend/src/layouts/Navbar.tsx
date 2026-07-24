@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Box, Avatar, Menu, MenuItem, Tooltip } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Box, Avatar, Menu, MenuItem, Tooltip } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -85,7 +85,7 @@ const Navbar: React.FC<NavbarProps> = ({ drawerWidth, handleDrawerToggle }) => {
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          <MenuItem onClick={() => { handleClose(); navigate('/dashboard/profile'); }}>Profile</MenuItem>
+          <MenuItem onClick={() => { handleClose(); navigate('/doctor/profile'); }}>Profile</MenuItem>
           <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
       </Toolbar>

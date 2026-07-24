@@ -1,179 +1,137 @@
-import React, { useState } from 'react';
-import { 
-  Box, Card, CardContent, Typography, TextField, Button, 
-  InputAdornment, IconButton, Alert, Link, FormControl, InputLabel, Select, MenuItem, FormHelperText, Grid, Snackbar
-} from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema, RegisterFormValues } from '../utils/authSchema';
-import { useRegisterMutation } from '../hooks/useAuthMutations';
+import * as z from 'zod';
+import { Box, Button, TextField, Typography, Container, Paper, CircularProgress, Link, Select, MenuItem, InputLabel, FormControl, FormHelperText } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useRegister } from '../hooks/useAuthQueries';
+import { RegisterRequest } from '../../../types/auth.types';
 
-const RegisterPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
+const registerSchema = z.object({
+  firstName: z.string().min(2, 'First name must be at least 2 characters'),
+  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  role: z.enum(['PATIENT', 'DOCTOR', 'ADMIN']),
+});
+
+export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const registerMutation = useRegisterMutation();
+  const { mutate: registerUser, isPending } = useRegister();
 
-  const { control, handleSubmit, formState: { errors } } = useForm<RegisterFormValues>({
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterRequest>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { firstName: '', lastName: '', email: '', password: '', role: 'PATIENT' }
+    defaultValues: {
+      role: 'PATIENT',
+    },
   });
 
-  const onSubmit = (data: RegisterFormValues) => {
-    registerMutation.mutate(data, {
-      onSuccess: () => {
-        setSuccessMsg('Account created successfully! Redirecting...');
-      }
-    });
+  const onSubmit = (data: RegisterRequest) => {
+    registerUser(data);
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', py: 4 }}>
-      <Card sx={{ maxWidth: 550, width: '100%', p: 2 }}>
-        <CardContent>
-          <Typography variant="h4" component="h1" gutterBottom align="center" color="primary.main" fontWeight="bold">
-            Create Account
+    <Container component="main" maxWidth="sm">
+      <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Paper elevation={3} sx={{ p: 4, width: '100%', borderRadius: 2 }}>
+          <Typography component="h1" variant="h5" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
+            Create an Account
           </Typography>
-          <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 4 }}>
-            Join CarePortal to manage your healthcare journey.
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
+            Join our platform to book or manage appointments
           </Typography>
 
-          {registerMutation.isError && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {/* @ts-ignore */}
-              {registerMutation.error?.response?.data?.message || 'Registration failed. Please try again.'}
-            </Alert>
-          )}
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="firstName"
+                label="First Name"
+                {...register('firstName')}
+                error={!!errors.firstName}
+                helperText={errors.firstName?.message}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="lastName"
+                label="Last Name"
+                {...register('lastName')}
+                error={!!errors.lastName}
+                helperText={errors.lastName?.message}
+              />
+            </Box>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="firstName"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="First Name"
-                      variant="outlined"
-                      error={!!errors.firstName}
-                      helperText={errors.firstName?.message}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="lastName"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Last Name"
-                      variant="outlined"
-                      error={!!errors.lastName}
-                      helperText={errors.lastName?.message}
-                    />
-                  )}
-                />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <Controller
-                  name="email"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Email Address"
-                      variant="outlined"
-                      error={!!errors.email}
-                      helperText={errors.email?.message}
-                    />
-                  )}
-                />
-              </Grid>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              autoComplete="email"
+              {...register('email')}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+            />
 
-              <Grid item xs={12}>
-                <Controller
-                  name="password"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Password"
-                      type={showPassword ? 'text' : 'password'}
-                      variant="outlined"
-                      error={!!errors.password}
-                      helperText={errors.password?.message}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Password"
+              type="password"
+              id="password"
+              {...register('password')}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+            />
 
-              <Grid item xs={12}>
-                <Controller
-                  name="role"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.role}>
-                      <InputLabel id="role-select-label">I am a...</InputLabel>
-                      <Select
-                        {...field}
-                        labelId="role-select-label"
-                        label="I am a..."
-                      >
-                        <MenuItem value="PATIENT">Patient</MenuItem>
-                        <MenuItem value="DOCTOR">Doctor</MenuItem>
-                      </Select>
-                      {errors.role && <FormHelperText>{errors.role.message}</FormHelperText>}
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-            </Grid>
+            <FormControl fullWidth margin="normal" error={!!errors.role}>
+              <InputLabel id="role-label">I am a...</InputLabel>
+              <Controller
+                name="role"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    labelId="role-label"
+                    id="role"
+                    label="I am a..."
+                  >
+                    <MenuItem value="PATIENT">Patient</MenuItem>
+                    <MenuItem value="DOCTOR">Doctor</MenuItem>
+                  </Select>
+                )}
+              />
+              {errors.role && <FormHelperText>{errors.role.message}</FormHelperText>}
+            </FormControl>
 
             <Button
               type="submit"
               fullWidth
               variant="contained"
               size="large"
-              disabled={registerMutation.isPending}
-              sx={{ py: 1.5, mt: 4, mb: 3 }}
+              sx={{ mt: 3, mb: 2, py: 1.5 }}
+              disabled={isPending}
             >
-              {registerMutation.isPending ? 'Creating Account...' : 'Register'}
+              {isPending ? <CircularProgress size={24} color="inherit" /> : 'Register'}
             </Button>
-
-            <Typography variant="body2" align="center">
-              Already have an account?{' '}
-              <Link component="button" type="button" variant="body2" onClick={() => navigate('/login')}>
-                Sign in
+            <Box sx={{ textAlign: 'center' }}>
+              <Link component="button" variant="body2" onClick={() => navigate('/login')} type="button">
+                Already have an account? Sign In
               </Link>
-            </Typography>
-          </form>
-        </CardContent>
-      </Card>
-      
-      <Snackbar open={!!successMsg} autoHideDuration={3000} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert severity="success" sx={{ width: '100%' }}>{successMsg}</Alert>
-      </Snackbar>
-    </Box>
+            </Box>
+          </Box>
+        </Paper>
+      </Box>
+    </Container>
   );
 };
-
-export default RegisterPage;

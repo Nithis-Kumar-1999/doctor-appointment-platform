@@ -1,5 +1,5 @@
 import React from 'react';
-import { Backdrop, CircularProgress, Typography, Box } from '@mui/material';
+import { Backdrop, CircularProgress, Typography } from '@mui/material';
 
 interface LoadingOverlayProps {
   open: boolean;

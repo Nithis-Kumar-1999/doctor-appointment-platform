@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-  Paper, TablePagination, CircularProgress, Box, Typography 
+  Paper, TablePagination, CircularProgress, Typography 
 } from '@mui/material';
 
 interface Column<T> {

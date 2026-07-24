@@ -1,142 +1,275 @@
-# 🏥 Enterprise Healthcare Appointment SaaS
-
 <div align="center">
-  <!-- IMPORTANT: Capture landing.png and place it in the /assets folder -->
-  <img src="assets/landing.png" alt="Project Banner" width="100%" />
+
+# 🏥 Doctor Appointment Platform
+
+### A full-stack, production-ready healthcare scheduling application
+
+[![React](https://img.shields.io/badge/React-19-%2361DAFB?style=flat-square&logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![Material UI](https://img.shields.io/badge/MUI-v9-007FFF?style=flat-square&logo=mui)](https://mui.com/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=flat-square&logo=springboot)](https://spring.io/projects/spring-boot)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](./LICENSE)
+
+[**Live Demo**](https://your-live-demo-url.vercel.app) · [**Backend API**](https://doctor-backend-f7nj.onrender.com/swagger-ui/index.html) · [**Report Bug**](https://github.com/your-username/doctor-appointment-platform/issues)
+
 </div>
 
-<p align="center">
-  <a href="#ci-cd"><img src="https://img.shields.io/github/actions/workflow/status/[Your-GitHub-Username]/[Your-Repo]/backend-ci.yml?branch=main" alt="Build Status"></a>
-  <a href="#deployment"><img src="https://img.shields.io/badge/Deploy-Render-46E3B7?style=flat&logo=render" alt="Deployed on Render"></a>
-  <a href="#deployment"><img src="https://img.shields.io/badge/Deploy-Vercel-000000?style=flat&logo=vercel" alt="Deployed on Vercel"></a>
-  <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/Spring_Boot-3.1-6DB33F?style=flat&logo=springboot" alt="Spring Boot"></a>
-  <a href="https://react.dev"><img src="https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react" alt="React 19"></a>
-  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat&logo=typescript" alt="TypeScript"></a>
-</p>
+---
 
-## 🚀 Live Demo & Links
-- **Frontend URL**: `https://[Your-Vercel-App-Name].vercel.app`
-- **Backend API**: `https://[Your-Render-App-Name].onrender.com`
-- **Swagger Documentation**: `https://[Your-Render-App-Name].onrender.com/swagger-ui.html`
-- **GitHub URL**: `https://github.com/[Your-GitHub-Username]/[Your-Repo]`
+## 📋 Table of Contents
 
-## 📖 Project Overview
-A production-ready, N-Tier Healthcare Appointment Booking platform. This application connects patients with medical professionals through a highly secure, intuitive, and blisteringly fast Single Page Application (SPA). Engineered with **Clean Architecture**, stateless JWT authentication, and strict Web Vitals optimization, this project serves as a masterclass in modern Full-Stack development.
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Screenshots](#screenshots)
+- [Folder Structure](#folder-structure)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Deployment](#deployment)
+- [API Documentation](#api-documentation)
+- [Future Improvements](#future-improvements)
+- [License](#license)
 
-### ✨ Key Features
-- **Role-Based Portals**: Distinct Dashboard and routing workflows for `DOCTOR` and `PATIENT` roles.
-- **Smart Booking Wizard**: Multi-step, interactive appointment booking with Zod-enforced schema validation.
-- **Stateless Authentication**: JWT architecture featuring dual Access/Refresh token rotation and Axios interceptors.
-- **Aggressive Caching**: Sub-50ms data retrieval using TanStack Query, eliminating redundant network calls.
-- **Immutable Databases**: Flyway SQL migrations ensure deterministic deployments.
+---
+
+## 🌟 Overview
+
+The **Doctor Appointment Platform** is a fully-featured, production-grade healthcare management system that seamlessly connects patients with medical professionals. Built with a feature-based modular architecture, it offers a clean, accessible, and responsive experience powered by modern React patterns.
+
+The frontend integrates with a live Spring Boot REST API deployed on Render, secured with JWT authentication, and built with zero TypeScript errors and zero ESLint warnings.
+
+---
+
+## ✅ Features
+
+### 🔐 Authentication & Security
+- JWT-based stateless authentication
+- Role-based access control (PATIENT / DOCTOR)
+- Protected routes with automatic redirect-to-login
+- Axios interceptor for automated token injection
+- Global 401 handler — auto logout on expired sessions
+
+### 👨‍⚕️ Doctor Module
+- Professional profile creation and editing
+- Weekly availability schedule management
+- Appointment dashboard with sorting, filtering, and search
+- Confirm / Complete / Cancel appointments with confirmation dialogs
+
+### 🧑‍💼 Patient Module  
+- Personal health profile creation and editing
+- Advanced doctor search with specialty and city filters
+- Smart appointment booking with dynamically generated time slots
+- Personal appointment history with status filtering and cancellation
+
+### 📅 Appointment System
+- Interactive slot picker based on doctor's weekly schedule
+- Real-time cache invalidation via React Query
+- Appointment status lifecycle: `PENDING → CONFIRMED → COMPLETED`
+- Cancellation with confirmation dialogs
+
+---
+
+## 💻 Tech Stack
+
+| Layer | Technology |
+|:---|:---|
+| **Frontend Framework** | React 19 + Vite 8 |
+| **Language** | TypeScript 6 (strict mode) |
+| **UI Library** | Material UI v9 |
+| **Data Fetching** | TanStack React Query v5 |
+| **Forms & Validation** | React Hook Form + Zod |
+| **HTTP Client** | Axios with interceptors |
+| **Routing** | React Router DOM v7 |
+| **Build Tool** | Vite + esbuild |
+| **Linter** | OxLint |
+| **Backend** | Spring Boot 3 + Java 21 |
+| **Database** | MySQL |
+| **Security** | Spring Security + JWT |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   React Frontend                      │
+│   (Vite + TypeScript + React Query + Material UI)    │
+│                                                       │
+│  ┌──────────┐  ┌──────────┐  ┌─────────────────┐   │
+│  │  Patient │  │  Doctor  │  │  Appointment     │   │
+│  │  Module  │  │  Module  │  │  Module          │   │
+│  └──────────┘  └──────────┘  └─────────────────┘   │
+│                    │                                  │
+│          Axios + JWT Interceptors                    │
+└─────────────────────────────────────────────────────┘
+                      │ REST API
+┌─────────────────────────────────────────────────────┐
+│                Spring Boot Backend                    │
+│         (Java 21 + Spring Security + JWT)            │
+│                                                       │
+│  AuthController │ DoctorController │ PatientController │
+│  AppointmentController │ AvailabilityController       │
+└─────────────────────────────────────────────────────┘
+                      │ JPA/Hibernate
+              ┌───────────────────┐
+              │   MySQL Database   │
+              └───────────────────┘
+```
+
+---
 
 ## 📸 Screenshots
 
-| Patient Dashboard | Doctor Dashboard | Booking Flow |
+> *(Add your screenshots below once deployed)*
+
+| Login | Patient Dashboard | Doctor Search |
 |:---:|:---:|:---:|
-| <img src="assets/patient-dashboard.png" width="300" /> | <img src="assets/doctor-dashboard.png" width="300" /> | <img src="assets/booking.gif" width="300" /> |
+| ![Login](./assets/screenshots/login.png) | ![Dashboard](./assets/screenshots/patient-dashboard.png) | ![Search](./assets/screenshots/doctor-search.png) |
 
-## 🛠 Tech Stack
+| Doctor Dashboard | Appointment Booking | Appointment Management |
+|:---:|:---:|:---:|
+| ![Doctor](./assets/screenshots/doctor-dashboard.png) | ![Booking](./assets/screenshots/booking.png) | ![Appointments](./assets/screenshots/appointments.png) |
 
-### Frontend (React SPA)
-- **Core**: React 19, TypeScript, Vite
-- **UI/UX**: Material UI (MUI v7), Emotion, Responsive Grid
-- **State**: TanStack Query (Server State), React Context (Auth State)
-- **Forms**: React Hook Form + Zod
-- **Optimization**: `React.lazy()` Code Splitting, Rollup `manualChunks`
-
-### Backend (Spring Boot REST API)
-- **Core**: Java 17, Spring Boot 3
-- **Security**: Spring Security, BCrypt, JWT (JSON Web Tokens)
-- **Data Persistence**: MySQL 8, Spring Data JPA (Hibernate)
-- **Migrations**: Flyway
-- **Documentation**: Springdoc OpenAPI (Swagger)
-
-### DevOps & Infrastructure
-- **CI/CD**: GitHub Actions
-- **Containerization**: Docker (Multi-stage JRE Alpine)
-- **Hosting**: Render (Backend) + Vercel (Frontend)
-
-## 🏗 System Architecture
-
-```mermaid
-erDiagram
-    USER ||--o| DOCTOR : "extends"
-    USER ||--o| PATIENT : "extends"
-    DOCTOR ||--o{ APPOINTMENT : "manages"
-    PATIENT ||--o{ APPOINTMENT : "books"
-    
-    USER {
-        Long id
-        String email
-        String role
-    }
-    APPOINTMENT {
-        Long id
-        Date date
-        Time time
-        String status
-    }
-```
-
-## 💻 Installation & Docker Setup
-
-### Prerequisites
-- Node.js 20+
-- Java 17
-- Docker & Docker Compose
-
-### 1. Database & Backend Setup
-Navigate to the backend directory and launch the MySQL container:
-```bash
-cd doctor-appointment-backend
-docker-compose up -d
-./mvnw spring-boot:run
-```
-
-### 2. Frontend Setup
-Navigate to the frontend directory:
-```bash
-cd doctor-appointment-frontend
-npm install
-npm run dev
-```
-
-## ☁️ Deployment Guide
-
-This project is strictly configured for deployment on Render and Vercel.
-
-**Manual Backend Steps (Render):**
-1. Connect your GitHub repository to a Render Web Service.
-2. Ensure you add `SPRING_PROFILES_ACTIVE=prod` to your Environment Variables.
-3. Configure your production PostgreSQL/MySQL Database URI via the Render dashboard.
-
-**Manual Frontend Steps (Vercel):**
-1. Connect your repository to Vercel.
-2. In the deployment settings, add `VITE_API_URL` pointing to your Render URL.
-
-## 📄 API Documentation
-When the backend is running, the interactive OpenAPI specification is available at:
-`http://localhost:8080/swagger-ui.html`
+---
 
 ## 📁 Folder Structure
-```text
-frontend/
-├── src/
-│   ├── features/         # Feature-Sliced Design (auth, doctor, patient, appointment)
-│   ├── components/       # Shared UI components
-│   ├── context/          # Global Contexts (Theme, Auth)
-│   └── routes/           # React Router DOM configuration
-backend/
-├── src/main/java/        # Clean Architecture (Controllers, Services, Repositories)
-├── src/main/resources/   # application.yml and Flyway /db/migration scripts
+
+```
+src/
+├── components/           # Global, reusable UI components
+│   ├── ConfirmationDialog.tsx
+│   ├── DataTable.tsx
+│   ├── ErrorBoundary.tsx
+│   ├── LoadingScreen.tsx
+│   └── ...
+├── context/              # React Contexts (Auth, Theme)
+│   ├── AuthContext.tsx
+│   └── ThemeContext.tsx
+├── features/             # Feature-based modular architecture
+│   ├── appointment/      # Booking & appointment lifecycle
+│   │   ├── api/          # appointmentApi.ts
+│   │   ├── components/   # AppointmentCard, AppointmentTable, SlotPicker
+│   │   ├── hooks/        # useAppointments.ts (React Query)
+│   │   ├── types/        # appointment.types.ts
+│   │   └── utils/        # timeSlotUtils.ts
+│   ├── auth/             # Login, Register, JWT handling
+│   │   ├── api/
+│   │   ├── components/   # ProtectedRoute, RoleGuard
+│   │   └── pages/
+│   ├── common/           # Cross-feature utilities (Snackbar)
+│   ├── doctor/           # Doctor profile & availability
+│   │   ├── api/
+│   │   ├── hooks/
+│   │   ├── pages/        # DoctorDashboard, Profile, Availability, Appointments
+│   │   └── types/
+│   └── patient/          # Patient profile & doctor search
+│       ├── api/
+│       ├── hooks/
+│       ├── pages/        # PatientDashboard, Profile, Search, Booking
+│       └── types/
+├── layouts/              # Dashboard layouts (Doctor, Patient, Navbars)
+├── pages/                # Global/Error pages (404, 403)
+├── routes/               # AppRoutes.tsx (centralized routing)
+├── services/             # apiClient.ts (Axios instance + interceptors)
+├── theme/                # MUI theme customization
+├── types/                # Global type definitions
+└── utils/                # tokenStorage.ts, constants.ts, env.ts
 ```
 
-## 🔄 CI/CD
-The repository features a robust GitHub Actions pipeline (`backend-ci.yml`) that automatically runs Maven tests and verifies build integrity on every push to the `main` branch.
+---
 
-## 📜 License
-Distributed under the MIT License.
+## 🛠 Installation
 
-## 👨‍💻 Author
-**[Your Name]**
+### Prerequisites
+- Node.js v18+
+- npm v9+
+- A running instance of the backend (see [backend repo](https://github.com/your-username/doctor-appointment-backend))
+
+### Steps
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/doctor-appointment-frontend.git
+cd doctor-appointment-frontend
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment variables
+cp .env.example .env
+# Edit .env and set your backend URL
+
+# 4. Start the development server
+npm run dev
+
+# App will be available at http://localhost:5173
+```
+
+---
+
+## 🔑 Environment Variables
+
+| Variable | Required | Description |
+|:---|:---:|:---|
+| `VITE_API_BASE_URL` | ✅ | The base URL of the Spring Boot backend (e.g. `https://your-backend.onrender.com`) |
+
+```env
+# .env.example
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+> ⚠️ **Never commit your `.env` file.** It is excluded via `.gitignore`.
+
+---
+
+## 🚀 Deployment
+
+### Frontend → Vercel *(Recommended)*
+
+1. Push your code to GitHub.
+2. Connect the repository to [Vercel](https://vercel.com).
+3. Set the environment variable `VITE_API_BASE_URL` in Vercel's project settings.
+4. Vercel auto-detects Vite. Ensure the build command is `npm run build` and the output directory is `dist`.
+5. The included `vercel.json` handles SPA routing, security headers, and asset caching automatically.
+
+### Backend → Render
+
+The backend is a Spring Boot application deployed on [Render](https://render.com).  
+See [Deployment.md](./Deployment.md) for full configuration details.
+
+---
+
+## 📖 API Documentation
+
+Interactive Swagger UI: [`https://doctor-backend-f7nj.onrender.com/swagger-ui/index.html`](https://doctor-backend-f7nj.onrender.com/swagger-ui/index.html)
+
+See [API.md](./API.md) for the full list of integrated and missing endpoints.
+
+---
+
+## 🔮 Future Improvements
+
+| Priority | Feature | Requires |
+|:---:|:---|:---|
+| 🔴 High | **Admin Dashboard** | New backend APIs (`/admin/*`) |
+| 🔴 High | **Slot Collision Prevention** | `GET /availability/doctor/{id}/slots?date=...` |
+| 🟡 Medium | **Edit/Delete Availability** | `PUT` & `DELETE /availability/{id}` |
+| 🟡 Medium | **HttpOnly Cookie Auth** | Backend security upgrade |
+| 🟢 Low | **Real-time Notifications** | WebSocket support |
+| 🟢 Low | **Appointment Reminders** | Email integration |
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](./LICENSE) file for details.
+
+---
+
+<div align="center">
+
+Made with ❤️ using React, TypeScript, and Spring Boot
+
+</div>

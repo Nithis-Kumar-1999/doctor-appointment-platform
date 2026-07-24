@@ -1,133 +1,87 @@
-import React, { useState } from 'react';
-import { 
-  Box, Card, CardContent, Typography, TextField, Button, 
-  FormControlLabel, Checkbox, InputAdornment, IconButton, Alert, Link, Snackbar
-} from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useForm, Controller } from 'react-hook-form';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, LoginFormValues } from '../utils/authSchema';
-import { useLoginMutation } from '../hooks/useAuthMutations';
+import * as z from 'zod';
+import { Box, Button, TextField, Typography, Container, Paper, CircularProgress, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useLogin } from '../hooks/useAuthQueries';
+import { LoginRequest } from '../../../types/auth.types';
 
-const LoginPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const loginMutation = useLoginMutation();
+  const { mutate: login, isPending } = useLogin();
 
-  const { control, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '', rememberMe: false }
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    loginMutation.mutate(data, {
-      onSuccess: () => {
-        setSuccessMsg('Login successful! Redirecting...');
-      }
-    });
+  const onSubmit = (data: LoginRequest) => {
+    login(data);
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-      <Card sx={{ maxWidth: 450, width: '100%', p: 2 }}>
-        <CardContent>
-          <Typography variant="h4" component="h1" gutterBottom align="center" color="primary.main" fontWeight="bold">
-            CarePortal
+    <Container component="main" maxWidth="xs">
+      <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Paper elevation={3} sx={{ p: 4, width: '100%', borderRadius: 2 }}>
+          <Typography component="h1" variant="h5" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
+            Welcome Back
           </Typography>
-          <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 4 }}>
-            Sign in to access your healthcare dashboard.
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
+            Sign in to access your dashboard
           </Typography>
 
-          {loginMutation.isError && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {/* @ts-ignore */}
-              {loginMutation.error?.response?.data?.message || 'Invalid email or password.'}
-            </Alert>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="Email Address"
-                  variant="outlined"
-                  margin="normal"
-                  error={!!errors.email}
-                  helperText={errors.email?.message}
-                />
-              )}
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              autoComplete="email"
+              autoFocus
+              {...register('email')}
+              error={!!errors.email}
+              helperText={errors.email?.message}
             />
-
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                  variant="outlined"
-                  margin="normal"
-                  error={!!errors.password}
-                  helperText={errors.password?.message}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              )}
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              {...register('password')}
+              error={!!errors.password}
+              helperText={errors.password?.message}
             />
-
-            <Controller
-              name="rememberMe"
-              control={control}
-              render={({ field }) => (
-                <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value} color="primary" />}
-                  label="Remember me"
-                  sx={{ mt: 1, mb: 2 }}
-                />
-              )}
-            />
-
             <Button
               type="submit"
               fullWidth
               variant="contained"
               size="large"
-              disabled={loginMutation.isPending}
-              sx={{ py: 1.5, mt: 2, mb: 3 }}
+              sx={{ mt: 3, mb: 2, py: 1.5 }}
+              disabled={isPending}
             >
-              {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
+              {isPending ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
             </Button>
-
-            <Typography variant="body2" align="center">
-              Don't have an account?{' '}
-              <Link component="button" type="button" variant="body2" onClick={() => navigate('/register')}>
-                Register here
+            <Box sx={{ textAlign: 'center' }}>
+              <Link component="button" variant="body2" onClick={() => navigate('/register')} type="button">
+                Don't have an account? Sign Up
               </Link>
-            </Typography>
-          </form>
-        </CardContent>
-      </Card>
-      
-      <Snackbar open={!!successMsg} autoHideDuration={3000} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert severity="success" sx={{ width: '100%' }}>{successMsg}</Alert>
-      </Snackbar>
-    </Box>
+            </Box>
+          </Box>
+        </Paper>
+      </Box>
+    </Container>
   );
 };
-
-export default LoginPage;

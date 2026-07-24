@@ -1,82 +1,84 @@
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
+import React, { Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
+import { RoleGuard } from '../features/auth/components/RoleGuard';
+import { LoginPage } from '../features/auth/pages/LoginPage';
+import { RegisterPage } from '../features/auth/pages/RegisterPage';
+import { UnauthorizedPage } from '../pages/errors/UnauthorizedPage';
+import { NotFoundPage } from '../pages/errors/NotFoundPage';
+import { LoadingScreen } from '../components/LoadingScreen';
+import { useAuth } from '../context/AuthContext';
+
 import DashboardLayout from '../layouts/DashboardLayout';
-import AuthGuard from '../features/auth/components/AuthGuard';
-import GuestGuard from '../features/auth/components/GuestGuard';
-import LoadingOverlay from '../components/LoadingOverlay';
+import DoctorDashboardPage from '../features/doctor/pages/DoctorDashboardPage';
+import DoctorProfilePage from '../features/doctor/pages/DoctorProfilePage';
+import AvailabilityPage from '../features/doctor/pages/AvailabilityPage';
 
-// Lazy loading pages for bundle optimization
-const LoginPage = lazy(() => import('../features/auth/pages/LoginPage'));
-const RegisterPage = lazy(() => import('../features/auth/pages/RegisterPage'));
+import PatientDashboardLayout from '../layouts/PatientDashboardLayout';
+import PatientDashboardPage from '../features/patient/pages/PatientDashboardPage';
+import PatientProfilePage from '../features/patient/pages/PatientProfilePage';
+import SearchDoctorsPage from '../features/patient/pages/SearchDoctorsPage';
+import DoctorDetailsPage from '../features/patient/pages/DoctorDetailsPage';
+import PatientAppointmentsPage from '../features/patient/pages/PatientAppointmentsPage';
 
-const DoctorDashboard = lazy(() => import('../features/doctor/pages/DoctorDashboard'));
-const DoctorAppointments = lazy(() => import('../features/doctor/pages/DoctorAppointments'));
-const DoctorAvailabilityPage = lazy(() => import('../features/doctor/pages/DoctorAvailability'));
-const DoctorProfilePage = lazy(() => import('../features/doctor/pages/DoctorProfile'));
+import DoctorAppointmentsPage from '../features/doctor/pages/DoctorAppointmentsPage';
 
-const PatientDashboard = lazy(() => import('../features/patient/pages/PatientDashboard'));
-const PatientProfilePage = lazy(() => import('../features/patient/pages/PatientProfile'));
-const MyAppointments = lazy(() => import('../features/patient/pages/MyAppointments'));
-const FindDoctors = lazy(() => import('../features/patient/pages/FindDoctors'));
+const AppRoutes: React.FC = () => {
+  const { isAuthenticated, user } = useAuth();
 
-const BookAppointmentPage = lazy(() => import('../features/appointment/pages/BookAppointmentPage'));
-const AppointmentDetailsPage = lazy(() => import('../features/appointment/pages/AppointmentDetailsPage'));
-const AppointmentSuccessPage = lazy(() => import('../features/appointment/pages/AppointmentSuccessPage'));
-
-const NotFound = lazy(() => import('../pages/NotFound'));
-
-/**
- * Global Routing Configuration.
- * Implements lazy loading / code splitting.
- */
-const AppRoutes = () => {
   return (
-    <Suspense fallback={<LoadingOverlay open={true} message="Loading content..." />}>
+    <Suspense fallback={<LoadingScreen />}>
       <Routes>
-        <Route element={<MainLayout />}>
-          
-          {/* Public Routes */}
-          <Route path="/" element={
-            <div style={{ textAlign: 'center', marginTop: '40px' }}>
-              <h1>Welcome to CarePortal</h1>
-              <p>Please login to book appointments.</p>
-            </div>
-          } />
-          
-          {/* Guest Routes (Redirect to dashboard if already logged in) */}
-          <Route element={<GuestGuard />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
-          
-          {/* Protected Dashboard Routes */}
-          <Route element={<AuthGuard />}>
-            <Route element={<DashboardLayout />}>
-              {/* Doctor Routes */}
-              <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
-              <Route path="/doctor/appointments" element={<DoctorAppointments />} />
-              <Route path="/doctor/availability" element={<DoctorAvailabilityPage />} />
-              <Route path="/doctor/profile" element={<DoctorProfilePage />} />
+        {/* Public Routes */}
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} />
+        <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />} />
+        
+        {/* Root Redirect based on Role */}
+        <Route 
+          path="/" 
+          element={
+            !isAuthenticated ? <Navigate to="/login" replace /> :
+            user?.role === 'DOCTOR' ? <Navigate to="/doctor/dashboard" replace /> :
+            user?.role === 'PATIENT' ? <Navigate to="/patient/dashboard" replace /> :
+            <Navigate to="/unauthorized" replace />
+          } 
+        />
 
-              {/* Patient Routes */}
-              <Route path="/patient/dashboard" element={<PatientDashboard />} />
-              <Route path="/patient/appointments" element={<MyAppointments />} />
-              <Route path="/patient/find-doctors" element={<FindDoctors />} />
-              <Route path="/patient/profile" element={<PatientProfilePage />} />
-              
-              <Route path="/patient/book-appointment/:doctorId" element={<BookAppointmentPage />} />
-              <Route path="/patient/appointment-details/:id" element={<AppointmentDetailsPage />} />
-              <Route path="/patient/appointment-success/:id" element={<AppointmentSuccessPage />} />
-              
-              {/* Fallback to patient dashboard for legacy /dashboard */}
-              <Route path="/dashboard" element={<PatientDashboard />} />
-            </Route>
-          </Route>
-          
-          {/* 404 Catch-All */}
-          <Route path="*" element={<NotFound />} />
+        {/* Protected Doctor Routes */}
+        <Route path="/doctor/*" element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['DOCTOR']}>
+              <DashboardLayout />
+            </RoleGuard>
+          </ProtectedRoute>
+        }>
+          <Route path="dashboard" element={<DoctorDashboardPage />} />
+          <Route path="profile" element={<DoctorProfilePage />} />
+          <Route path="availability" element={<AvailabilityPage />} />
+          <Route path="appointments" element={<DoctorAppointmentsPage />} />
+          {/* Add a catch-all to redirect invalid doctor routes to dashboard */}
+          <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>
+
+        {/* Protected Patient Routes */}
+        <Route path="/patient/*" element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['PATIENT']}>
+              <PatientDashboardLayout />
+            </RoleGuard>
+          </ProtectedRoute>
+        }>
+          <Route path="dashboard" element={<PatientDashboardPage />} />
+          <Route path="profile" element={<PatientProfilePage />} />
+          <Route path="search" element={<SearchDoctorsPage />} />
+          <Route path="doctor/:id" element={<DoctorDetailsPage />} />
+          <Route path="appointments" element={<PatientAppointmentsPage />} />
+          <Route path="*" element={<Navigate to="dashboard" replace />} />
+        </Route>
+
+        {/* Error Routes */}
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
   );

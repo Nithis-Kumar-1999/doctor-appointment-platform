@@ -2,28 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [1.0.0] - 2026-07-10
+## [1.0.0] - 2026-07-24
 
 ### Added
-- **Backend**: Complete Spring Boot REST API structured with Clean Architecture.
-- **Backend**: JWT Stateless Authentication flow with automatic Refresh Token rotation.
-- **Backend**: Flyway database migrations establishing Users, Roles, Doctors, Patients, and Appointments schemas.
-- **Backend**: Docker multi-stage build support and CI/CD GitHub Actions workflow.
-- **Frontend**: React 19 + TypeScript SPA built with Vite.
-- **Frontend**: Authentication, Patient, Doctor, and Appointment functional modules.
-- **Frontend**: TanStack Query integration for aggressive data caching and server-state management.
-- **Frontend**: Multi-step Appointment Booking Wizard with strict Zod validation.
-- **Frontend**: Production hardening including `React.lazy()` code splitting, Error Boundaries, and MSW test infrastructure.
-- **Documentation**: Extensive portfolio, architectural, and maintenance documentation artifacts.
-
-### Security
-- Passwords are encrypted using BCrypt.
-- Strict Cross-Origin Resource Sharing (CORS) configurations.
-- Vercel edge-network security HTTP headers.
+- **Module 1: Authentication System**
+  - JWT storage in AuthContext.
+  - Axios interceptors for `Authorization` headers.
+  - Role-based route guards for `PATIENT` and `DOCTOR`.
+  - Login and Registration Pages with Zod validation.
+- **Module 2: Doctor Dashboard & Profile**
+  - Responsive Sidebar & Navbar layout.
+  - Doctor Profile Creation and Management.
+  - Backend integration via `GET /api/v1/doctors/profile/me`.
+- **Module 3: Doctor Availability**
+  - Interactive grid to submit weekly availability schedules.
+  - Validation to prevent overlapping times or negative durations.
+- **Module 4: Patient Dashboard & Doctor Search**
+  - Dedicated Patient Dashboard metrics.
+  - Doctor Search Engine utilizing `GET /api/v1/doctors` with Specialty filters.
+  - Responsive Doctor Profile Cards and Doctor Details view.
+- **Module 5: Appointment Booking & Management**
+  - Smart interactive `SlotPicker` that generates valid time slots dynamically.
+  - Appointment Booking Integration (`POST /api/v1/appointments`).
+  - Doctor Appointment Management (Sorting, Filtering, Status updates).
+  - Patient Appointment History and Cancellation functionality.
 
 ### Changed
-- Refactored frontend routes to exclusively use lazy-loading for bundle optimization.
-- Optimized JPA Repositories to utilize `@EntityGraph` to resolve N+1 query performance bottlenecks.
+- Complete refactor to Feature-Based folder structure.
+- Upgraded to Material UI v6 Grid API.
+- Replaced Redux with React Query for efficient server state caching.
+
+### Fixed
+- Fixed fast refresh warnings by splitting Context hooks.
+- Eliminated all unused imports and ESLint warnings.
+- Achieved zero TypeScript compiler errors under strict mode.

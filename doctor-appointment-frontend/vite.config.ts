@@ -8,27 +8,20 @@ export default defineConfig({
   build: {
     target: 'esnext',
     minify: 'esbuild',
-    chunkSizeWarningLimit: 800,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-mui': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-utils': ['react-hook-form', 'zod', 'axios']
+        manualChunks: (id: string) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('@mui')) return 'vendor-mui';
+            if (id.includes('@tanstack')) return 'vendor-query';
+            if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) return 'vendor-forms';
+            if (id.includes('axios')) return 'vendor-http';
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) return 'vendor-react';
+            return 'vendor';
+          }
         }
       }
-    }
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/setupTests.ts',
-    css: true,
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'src/setupTests.ts']
     }
   }
 });

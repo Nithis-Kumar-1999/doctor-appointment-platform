@@ -16,7 +16,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ title, description, actionText,
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 8, textAlign: 'center' }}>
       <FolderOffOutlinedIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
-      <Typography variant="h5" color="text.primary" fontWeight="bold" gutterBottom>
+      <Typography variant="h5" color="text.primary" sx={{ fontWeight: 'bold' }} gutterBottom>
         {title}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 400 }}>
