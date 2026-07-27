@@ -12,46 +12,46 @@ Live Demo
 🚀 Features:-
 
 Authentication:
-JWT Authentication
-Role-based Authorization (Doctor / Patient)
-Secure Password Encryption (BCrypt)
+JWT Authentication,
+Role-based Authorization (Doctor / Patient),
+Secure Password Encryption (BCrypt),
 Refresh Token Support
 
 Patient:
-Register & Login
-Search Doctors
-View Doctor Details
-Book Appointment
+Register & Login,
+Search Doctors,
+View Doctor Details,
+Book Appointment,
 View Appointment History
 
 Doctor:
-Login
-Manage Profile
-Manage Availability
-Accept / Reject Appointments
-View Dashboard
+Login,
+Manage Profile,
+Manage Availability,
+Accept / Reject Appointments,
+View Dashboard,
 🛠 Tech Stack
 
 Backend:
-Java 17
-Spring Boot
-Spring Security
-Spring Data JPA
-Hibernate
-MySQL
-JWT
+Java 17,
+Spring Boot,
+Spring Security,
+Spring Data JPA,
+Hibernate,
+MySQL,
+JWT,
 Maven
 
 Frontend:
-React
-TypeScript
-Vite
-Material UI
-TanStack Query
-React Hook Form
-Axios
+React,
+TypeScript,
+Vite,
+Material UI,
+TanStack Query,
+React Hook Form,
+Axios,
 
 Deployment:
-Render
-Vercel
+Render,
+Vercel,
 Aiven MySQL
