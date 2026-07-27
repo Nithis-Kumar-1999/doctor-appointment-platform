@@ -30,6 +30,7 @@ Manage Profile,
 Manage Availability,
 Accept / Reject Appointments,
 View Dashboard,
+
 🛠 Tech Stack
 
 Backend:
